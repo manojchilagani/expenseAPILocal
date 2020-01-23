@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="topnav">
+
+        <div class="btn-group">
+            <a class="btn btn-dark" href="/Home/Firstpage">Home</a>
+            @*<a class="btn btn-info" href="/Home/Index">Main</a>*@
+            <a class="btn btn-primary" href="/Home/ProposeNewBudget">Create New Report</a>
+            <a class="btn btn-secondary" href="/Home/Draft">Drafts</a>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <p class="h2 text-white" style="padding:5px">Expense Planner</p>
+           
+        </div>
+        
+        <a class="btn btn-success" href="/Home/Logout" style="float:right;">Logout</a>
+
+    </div>
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>

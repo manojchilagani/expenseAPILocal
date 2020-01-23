@@ -1,0 +1,296 @@
+﻿@{
+    ViewBag.Title = "Draft";
+}
+@{
+    if (Session["uid"] == null)
+    {
+        Response.Redirect("/Home/Login");
+    }
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+   
+    <script>
+        
+        $(document).ready(function () {
+            var sessionval = $("#hdnSession").data('value');
+           // alert(sessionval);
+            var d = new Date().getFullYear();
+            var a;
+            var year;
+            for (var i = 1; i >= -2; i--) {
+                if (i == 0) {
+                    year = d - i;
+                    a += '<option value="' + year + '" selected>' + year + '</option>';
+                }
+                else {
+                    year = d - i;
+                    a += '<option value="' + year + '">' + year + '</option>';
+                }
+            }
+            $("#year2").html(a);
+            $("#year2").change(function () {
+                var w=$("#year2").val();
+                $("#tblbody").empty();
+               // sort_year();
+                
+                $.ajax({
+                    type: "GET",
+                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/Budget",
+                    contentType: "application/json",
+                    crossDomain: true,
+                    dataType: "json",
+                    async: false,
+                    success: function (data) {
+                        var data1 = data;
+                        var viewdata1 = [];
+                        //alert(sessionval);
+                        //alert("hey");
+
+                        $.ajax({
+                            type: "Get",
+                            url: "http://10.145.8.188/ExpenseManagementAPI1/api/ExpenseMgmtView/"+sessionval,
+                            contentType: "application/json",
+                            crossDomain: true,
+                            dataType: "json",
+                            async: false,
+                            success: function (data) {
+                                // alert(data1.Data[3].Budgetid);
+                                var j = 0;
+                                var k = 0;
+                                var c = 0;
+
+                                for (j = 0; j < data1.Data.length; j++) {
+                                    c = 0;
+                                    for (k = 0; k < data.Data.length && c == 0; k++) {
+                                        // below userid needs to be changed
+                                        if ((data1.Data[j].Budgetid == data.Data[k].Budgetid) && (data.Data[k].Year == w) && (data.Data[k].Saved == false || data.Data[k].Saved == 0 || data.Data[k].Saved == "False")) {
+                                            viewdata1.push({ "bid": data1.Data[j].Budgetid, "bn": data1.Data[j].BudgetName })
+                                            c++;
+                                            
+                                        }
+                                    }
+                                }
+                                //(data.Data[j].Userid == sessionval) &&
+                                //alert(viewdata1[0]["bid"]);
+                                // alert(viewdata1.length)
+
+                                var z = 0;
+                                var i = 1;
+                                for (z = 0; z < viewdata1.length; z++) {
+                                    $("#tblbody").append("<tr class='rowdata'><td>" + i + "</td><td> " + viewdata1[z]["bid"] + "</td><td> " + viewdata1[z]["bn"] + "</td><td><button class='btn btn-success buttons' type='button'>Edit</button> </td></tr>")
+                                    i++;
+                                }
+                            }
+                        })
+                    },
+                    error: function (msg) {
+                        alert("error");
+                    }
+
+                });
+                $('button').click(function () {
+                    var currow = $(this).closest('tr');
+                    var id = currow.find('td:eq(1)').text();
+                    //alert(id);
+                    window.location.href = "/Home/ProposeNewBudget/" + id;
+
+                })
+            });
+            $.ajax({
+                type: "GET",
+                url: "http://10.145.8.188/ExpenseManagementAPI1/api/Budget",
+                contentType: "application/json",
+                crossDomain: true,
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    var data1 = data;
+                    var viewdata1 = [];
+                    
+                    $.ajax({
+                        type: "Get",
+                        url: "http://10.145.8.188/ExpenseManagementAPI1/api/ExpenseMgmtView/"+sessionval,
+                        contentType: "application/json",
+                        crossDomain: true,
+                        dataType: "json",
+                        async: false,
+                        success: function (data) {
+                           
+                             //alert(data.Data[0].Budgetid);
+                            var j = 0;
+                            var k = 0;
+                            var c = 0;
+
+                            for (j = 0; j < data1.Data.length; j++) {
+                                c = 0;
+                                for (k = 0; k < data.Data.length && c == 0; k++) {
+                                    // below userid needs to be changed
+                                    if ((data1.Data[j].Budgetid == data.Data[k].Budgetid) /*&& (data.Data[j].Userid == sessionval)*/ && (data.Data[k].Year == $("#year2").val()) && (data.Data[k].Saved == false || data.Data[k].Saved == 0 || data.Data[k].Saved == "False")) {
+                                        viewdata1.push({ "bid": data1.Data[j].Budgetid, "bn": data1.Data[j].BudgetName })
+                                        c++;
+                                    }
+                                }
+                            }
+                            //alert(viewdata1[0]["bid"]);
+                            // alert(viewdata1.length)
+                           
+                            var z = 0;
+                            var i = 1;
+                            for (z = 0; z < viewdata1.length; z++) {
+                                $("#tblbody").append("<tr class='rowdata'><td>" + i + "</td><td> " + viewdata1[z]["bid"] + "</td><td> " + viewdata1[z]["bn"] + "</td><td><button class='btn btn-success buttons' type='button'>Edit</button> </td></tr>")
+                                i++;
+                            }
+                        }
+                    })
+                }
+            })
+            $('button').click(function () {
+                var currow = $(this).closest('tr');
+                var id = currow.find('td:eq(1)').text() ;
+                //alert(id);
+                window.location.href = "/Home/ProposeNewBudget/" + id;
+
+            })
+        });
+
+
+        ////function sort_year() {
+        //    $.ajax({
+        //        type: "GET",
+        //        url: "http://10.145.8.188/ExpenseManagementAPI1/api/Budget",
+        //        contentType: "application/json",
+        //        crossDomain: true,
+        //        dataType: "json",
+        //        async: false,
+        //        success: function (data) {
+        //            var data1 = data;
+        //            var viewdata1 = [];
+
+        //            $.ajax({
+        //                type: "Get",
+        //                url: "http://10.145.8.188/ExpenseManagementAPI1/api/ExpenseMgmtView",
+        //                contentType: "application/json",
+        //                crossDomain: true,
+        //                dataType: "json",
+        //                async: false,
+        //                success: function (data) {
+        //                    // alert(data1.Data[3].Budgetid);
+        //                    var j = 0;
+        //                    var k = 0;
+        //                    var c = 0;
+
+        //                    for (j = 0; j < data1.Data.length; j++) {
+        //                        c = 0;
+        //                        for (k = 0; k < data.Data.length && c == 0; k++) {
+        //                            // below userid needs to be changed
+        //                            if ((data1.Data[j].Budgetid == data.Data[k].Budgetid) && (data.Data[j].Userid == sessionval) && (data.Data[k].Year == $("#year2").val()) && (data.Data[k].Saved == false || data.Data[k].Saved == 0 || data.Data[k].Saved == "False")) {
+        //                                viewdata1.push({ "bid": data1.Data[j].Budgetid, "bn": data1.Data[j].BudgetName })
+        //                                c++;
+        //                            }
+        //                        }
+        //                    }
+        //                    //alert(viewdata1[0]["bid"]);
+        //                    // alert(viewdata1.length)
+        //                    $("#tblbody").empty();
+        //                    var z = 0;
+        //                    var i = 1;
+        //                    for (z = 0; z < viewdata1.length; z++) {
+        //                        $("#tblbody").append("<tr class='rowdata'><td>" + i + "</td><td> " + viewdata1[z]["bid"] + "</td><td> " + viewdata1[z]["bn"] + "</td><td><button class='btn btn-success buttons' type='button'>Edit</button> </td></tr>")
+        //                        i++;
+        //                    }
+        //                }
+        //            })
+        //        }
+        //    })
+        //};
+    </script>
+
+</head>
+<body style="background-color:#f7f7e9;">
+    <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+
+            </div>
+            <div class="col-md-8">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @*enter code*@
+                            <br />  <p class="text-center h4">Year</p><br />
+
+                        </div>
+                        <div class="col-md-6 ">
+                            <div class="col-md-12">
+                                <br />
+                                <select class="form-control form-control-sm btn-primary inputWidth1" id="year2"></select>
+                                <br />
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-2">
+
+            </div>
+        </div>
+
+        @*ksnn*@
+
+
+
+        <div class="row">
+            <div class="col-md-10 offset-1">
+
+                <div class="customDiv2 table-responsive-sm overflow-auto" style="margin-left:20px ; margin-right:20px ;margin-top:30px">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Budget Id</th>
+                                <th>Budget Name</th>
+                                <th>Edit</th>
+
+                            </tr>
+                        </thead>
+
+
+                        <tbody id="tblbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
+
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+            </script>
+            <script src="bootstrap/js/bootstrap.min.js"></script>
+        <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+        <script src="~/Scripts/bootstrap.min.js"></script>*@
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</body>
+</html>
+
+

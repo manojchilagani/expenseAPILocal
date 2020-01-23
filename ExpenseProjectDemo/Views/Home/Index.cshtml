@@ -1,0 +1,616 @@
+﻿@{
+    if (Session["uid"] == null)
+    {
+        Response.Redirect("/Home/Login");
+    }
+}
+<script src="~/Scripts/popper.js"></script>
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<script src="~/Scripts/moment.js"></script>
+<link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+<script>
+    var bid=@ViewData["bid"];
+    var syear=@ViewData["selectedyear"];
+    var cat=0;
+    var spentamt=0;
+    var dates;
+    function Display(h,i) {
+        //alert(h);
+        $('#AddExp').modal('show');
+        //alert(i);
+        $.ajax({
+            type: "GET",
+            url: "http://10.145.8.188/ExpenseManagementAPI1/api/ExpenseMgmtView/"+i,
+            contentType: "application/json",
+            crossDomain: true,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                var cnt=0;
+                $("#ShowExpenseTabletbody").empty();
+                for(var b=0;b<=data.Data.length;b++)
+                {
+                    if(data.Data[b].Categoryid== h)
+                    {
+                        val=data.Data[b];
+
+                        if(val.AmountSpent!=null && val.Date!=null)
+                        {
+                            var options1 = { year: 'numeric', month: 'long', day: 'numeric' };
+                            dates=new Date(val.Date).toLocaleDateString("en-US", options1);//
+                            //alert(dates+"   "+val.Date);
+                            //$("#ShowExpenseTabletbody").empty();
+                            if(val.Comment==null)
+                            {
+
+                                $("#ShowExpenseTabletbody").append('<tr><td>' +  dates+ '</td><td>' +val.AmountSpent  + '</td><td>' + "  " + '</td></tr>');
+                            }
+                            else
+                            {
+                                $("#ShowExpenseTabletbody").append('<tr><td>' + dates + '</td><td>' + val.AmountSpent + '</td><td>' + val.Comment + '</td></tr>');
+                            }
+                            cnt++;
+                        }
+                    }
+
+                }
+                if(cnt==0){
+                    alert("no data found");
+                }
+
+            },
+            error: function (msg) {
+                alert("erorr");
+            }
+        })
+    }
+    function getCategory(c,s) {
+        cat = c;
+        spentamt = s;
+        //alert();
+        // remain = r;
+        // alert(remain);
+        $('#AddCategory1').modal('show');
+        $.ajax({
+            type: "Get",
+            url: "http://10.145.8.188/ExpenseManagementAPI1/api/Category/"+c,
+            contentType: "application/json",
+            crossDomain: true,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                //alert(data.Data[0].CategoryName);
+                $("#inputCategoryName1").val(data.Data[0].CategoryName);
+                $("#inputAllocateAmount1").val(data.Data[0].AmountProposed);
+                $("#inputDescription1").val(data.Data[0].Description);
+                // amount = data.Data[0].AmountProposed;
+            }
+        });
+    };
+    $(document).ready(function () {
+        //alert(bid);
+        var sessionValue = $("#hdnSession").data('value');
+        //alert(sessionValue);
+        //alert(syear);
+        var q=0;
+        var bts=0;
+        var tb=0;
+        var remaining=0;
+        document.getElementById("yeardisplay").innerHTML = syear;
+        $.ajax({
+            type: "Get",
+            url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/"+sessionValue,
+            contentType: "application/json",
+            crossDomain: true,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                var i = 1;
+
+                $.each(data.Data, function (key, val) {
+                    //alert(val.budget_totalSpent);
+                    if (val.Budgetid == bid) {
+                        var rem = val.AmountProposed - val.totalspent;
+                        $("#tbldata").append("<tr><td>" + i + "</td><td> " + val.CategoryName + "</td><td> " + val.AmountProposed + "</td><td> " + val.totalspent + "</td><td> " + rem + "</td><td><button id='btnID" + val.Categoryid + "' type='button' class='btn btn-success' onclick='Display(" + val.Categoryid + "," + sessionValue + ");'>Expenses</button>  <button class='btn btn-info' type='button' onclick='getCategory(" + val.Categoryid +","+val.totalspent+ ")'>Edit</button></td></tr>")
+                        i++;
+                        q+=val.AmountProposed;
+                        bts=val.budget_totalSpent;
+                        //alert(bts);
+                        tb=val.totalBudget;
+                        //alert(bts);
+                        //alert(tb);
+                        remaining=remaining+rem;
+                    }
+
+
+                })
+                //alert(bts);
+                document.getElementById("L1").innerHTML =bts;
+                document.getElementById("L2").innerHTML =q;
+                document.getElementById("L3").innerHTML =remaining;
+            }
+        })
+
+        //<------------------------------------------------------------------------------------------>
+        $("#SaveCategory").click(function () {
+            var C = {};
+            C.Categoryid = -1;
+            C.CategoryName = $("#inputCategoryName").val();
+            C.AmountProposed = $("#inputAllocateAmount").val();
+            C.Description = $("#inputDescription").val();
+            $.ajax({
+                type: "Post",
+                url: "http://10.145.8.188/ExpenseManagementAPI1/api/Category",
+                contentType: "application/json",
+                crossDomain: true,
+                dataType: "json",
+                data: JSON.stringify(C),
+                async: false,
+                success: function (data) {
+                    var val = data.Data;
+                    //alert(val.Message + "   ");
+                    var PB = {};
+                    PB.Id = -1;
+                    PB.Userid = sessionValue;
+                    PB.Categoryid = val.Id;
+                    PB.Budgetid = bid;
+                    PB.Expenseid = null;
+                    PB.Alloted = true;
+                    PB.Saved = true;
+                    $.ajax({
+                        type: "Post",
+                        url: "http://10.145.8.188/ExpenseManagementAPI1/api/ProposedBudget",
+                        contentType: "application/json",
+                        crossDomain: true,
+                        dataType: "json",
+                        data: JSON.stringify(PB),
+                        async: false,
+                        success: function (data) { }
+                    });
+                    location.reload();
+                }
+            });
+        });
+        $("#SaveCategory1").click(function () {
+            // alert(cat+" "+cat);
+            var C1 = {};
+            C1.Categoryid = cat;
+            C1.CategoryName = $("#inputCategoryName1").val();
+            C1.AmountProposed = $("#inputAllocateAmount1").val();
+            C1.Description = $("#inputDescription1").val();
+            //alert(spentamt);
+            //  alert(C1.CategoryName + "  " + C1.AmountProposed + " " + C1.Description);
+            if ((C1.AmountProposed) >= spentamt) {
+                $.ajax({
+                    type: "Put",
+                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/Category/" + cat,
+                    contentType: "application/json",
+                    crossDomain: true,
+                    dataType: "json",
+                    data: JSON.stringify(C1),
+                    async: false,
+                    success: function (data) {
+                        alert("Saved Successfully");
+                    },
+                    error: function (msg) {
+                        alert("failed");
+                    }
+                });
+                location.reload();
+            }
+            else {
+                alert("CategoryBudget amount should be more than Amount already spent ");
+            }
+        });
+        //<------------------------------------------------------------------------------------------>
+        $("#SaveExpense").click(function () {
+            var s=Save();
+            if(s=="true")
+            {
+                alert("Expense Added Successfully");
+                $("#CategoryName").val("");
+                $("#AmountRemaining").val("");
+                $("#AmountSpent").val("");
+                $("#Comment").val("");
+
+                location.reload();
+            }
+
+        });
+        $("#SaveExpenseAdd").click(function () {
+            if(Save()=="true")
+            {
+                alert("Expense Added Successfully");
+                //var a = $("#AmountRemaining").val() - $("#AmountSpent").val();
+                $("#CategoryName").val("");
+                //$("#AmountRemaining").val(a);
+                $("#AmountRemaining").val("");
+                $("#AmountSpent").val("");
+                $("#Comment").val("");
+            }
+        });
+        $("#Expensecancel").click(function(){
+            //alert("Refreshed");
+            location.reload();
+        });
+        //$("#Popupcancel").click(function(){
+
+        //});
+        $("#CategoryName").focus(function () {
+            $.ajax({
+                type: "Get",
+                url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/"+sessionValue,
+                contentType: "application/json",
+                crossDomain: true,
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    var val = data.Data;
+                    $("#CategoryName").empty();
+                    $("#CategoryName").append("<option>Select Category</option>")
+                    $.each(data.Data, function (key, val) {
+                        if (val.Budgetid==bid) {
+                            var rem = val.AmountProposed - val.totalspent;
+                            $("#CategoryName").append('<option value="' + rem + ',' + val.Categoryid + '">' + val.CategoryName + '</option>');
+                        }
+                    });
+                    $("#CategoryName").change(function () {
+                        var array = $("#CategoryName").val().split(",");
+                        $("#AmountRemaining").val(array[0]);
+                        //$("#Comment").val(array[1]);
+                    });
+                }
+            });
+        });
+        function Save() {
+            //alert("hey are you trying to save this");
+            var C = {};
+            C.Expenseid = -1;
+            C.AmountSpent = $("#AmountSpent").val();
+            C.Date = moment().format('M/D/YYYY');
+            C.Comment = $("#Comment").val();
+            //alert( C.Expenseid+" "+C.AmountSpent+" "+ C.Date+" "+C.Comment);
+
+            //alert($("#AmountSpent").val()+"  "+$("#AmountRemaining").val());
+            //if(($("#AmountSpent").val()<=($("#AmountRemaining").val())))
+            var as=parseFloat($("#AmountSpent").val());
+            var ar=parseFloat($("#AmountRemaining").val());
+            //if(as == NaN || ar == NaN) {alert("Enter valid num."); return;}
+            //alert(((as)>=(ar)) +"  "+as+">="+ar);
+            //alert(as);
+            
+            if(ar>= as && ($("#AmountSpent").val()!=""))
+            {
+                //alert("entered");
+                $.ajax({
+                    type: "Post",
+                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/Expense",
+                    contentType: "application/json",
+                    crossDomain: true,
+                    dataType: "json",
+                    data: JSON.stringify(C),
+                    async: false,
+                    success: function (data) {
+                        var val = data.Data;
+                        //alert(val);
+                        var array = $("#CategoryName").val().split(",");
+                        //alert(val.Message + "   ");
+                        var PB = {};
+                        PB.Id = -1;
+                        PB.Userid = sessionValue;
+                        PB.Categoryid =array[1] ;
+                        PB.Budgetid = bid;
+                        PB.Expenseid = val.Id;
+                        PB.Alloted = true;
+                        PB.Saved = true;
+                        $.ajax({
+                            type: "Post",
+                            url: "http://10.145.8.188/ExpenseManagementAPI1/api/ProposedBudget",
+                            contentType: "application/json",
+                            crossDomain: true,
+                            dataType: "json",
+                            data: JSON.stringify(PB),
+                            async: false,
+                            success: function (data) {
+                                //alert("Success");
+                            }
+                        });
+
+                    }
+                });
+                return "true";
+
+            }
+            else if($("#AmountSpent").val()=="")
+            {
+                alert("Enter Valid Amount");
+                return "false";
+            }
+            else
+            {
+                alert("Insufficient balance");
+                //$("#CategoryName").val("");
+                //$("#AmountRemaining").val("");
+                $("#AmountSpent").val("");
+                //$("#Comment").val("");
+                return "false";
+            }
+        }
+        //<------------------------------------------------------------------------------------------>
+    });
+</script>
+
+<body>
+    <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+
+            </div>
+            <div class="col-md-8">
+                <div class="container  ">
+                    <div class="row">
+                        <div class="col-md-3">
+                            @*enter code*@
+                            <br />  <p class="text-center h4">Year :<label class="text-center h4" style="color:#999999;" id="yeardisplay">  </label></p><br />
+                        </div>
+                        @*<div class="col-md-6 ">
+                                <div class="col-md-12">
+                                    <br />
+                                    <label class="text-center h4" style="color:#999999;" id="yeardisplay"></label>
+                                    <br />
+                                </div>
+                            </div>*@
+                        <div class="col-md-3">
+                            @*enter code*@
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-2">
+                <div class="col-md-12 ">
+                    <br />
+                    <button class="btn btn-dark   float-md-right " type="button" data-target="#AddExpense" data-toggle="modal" id="AddExpenseButton">Add Expense</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    @*ksnn*@
+    <div class="row">
+        <div class="col-md-12">
+
+            <div class="customDiv2 table-responsive-md overflow-auto" style="margin:20px; border-style:outset;">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Expense Category</th>
+                            <th>Budget</th>
+                            <th>Amount Spent</th>
+                            <th>Amount Available</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbldata"></tbody>
+                </table>
+            </div>
+            @*<div class="customDiv2 table-responsive-md overflow-auto" style="margin:20px">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr class="col-md-12">
+                            <td class="row-cols-md-3 text-left">Total</td>
+
+                            <td class="row-cols-md-3 ">
+
+                                <label class="h5" style="color:cornflowerblue;" id="L2"></label>
+                                </td>
+                            <td class="row-cols-md-3">
+                                <label class="h5" style="color:#23c418;" id="L1"> </label>
+                                </td>
+                            <td class="row-cols-md-3">
+                                <label class="h5" style="color:#f2120f;" id="L3"> </label>
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+
+                </table>
+                </div>*@
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-1"><label class="h5">@*&emsp;&emsp;&ensp;*@ TOTAL:</label></div>
+        <div class="col-md-2 text-center">&emsp;<label class="h5 " style="color:cornflowerblue;" id="L2"></label></div>
+        <div class="col-md-2 text-center "><label class="h5" style="color:#23c418;" id="L1"> </label></div>
+        @*<div class="col-md-2"></div>*@
+        <div class="col-md-2 text-center"><label class="h5" style="color:#f2120f;" id="L3"> </label></div>
+        <div class="col-md-3"></div>
+    </div>
+    <div class="row ">
+        <div class="col-md-12">
+            <div class="offset-md-10">
+                <br />
+                <button class="btn btn-success  float-md-right" style="margin-right:20px" type="button" data-target="#AddCategory" data-toggle="modal">Add Category</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade " tabindex="-1" id="AddExp" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content category_bg">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <table class="table table-bordered table-striped" id="ShowExpenseTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>AmountSpent</th>
+                                    <th>Expense</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ShowExpenseTabletbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn category_bgbutton btn-danger"
+                            data-dismiss="modal" id="Popupcancel">
+                        Cancel
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade " tabindex="-1" id="AddExpense" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content category_bg">
+                <div class="modal-header">
+                    @*<button type="button" class="close" data-dismiss="modal">
+                            &times;
+                        </button>*@
+
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="CategoryName">Category</label>
+                            <select class="form-control" id="CategoryName"></select>
+                            @*<input class="form-control"
+                                type="text" id="CategoryName" />*@
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="AmountRemaining"> Amount Remaining</label>
+                            <input class="form-control"
+                                   type="text" id="AmountRemaining" />
+                        </div>
+                        <div class="form-group">
+                            <label for="AmountSpent">Amount Spent</label>
+                            <input class="form-control"
+                                   type="text" id="AmountSpent" />
+                        </div>
+                        <div class="form-group">
+                            <label for="Comment">Comment</label>
+                            <input class="form-control"
+                                   type="text" id="Comment" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn category_bgbutton btn-success" id="SaveExpense">Save</button>
+                    <button type="button" class="btn category_bgbutton btn-danger"
+                            data-dismiss="modal" id="Expensecancel">
+                        Cancel
+                    </button>
+                    <button class="btn category_bgbutton btn-success" id="SaveExpenseAdd">Save & Add  </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade " tabindex="-1" id="AddCategory" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content category_bg">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="inputUserName">Category Name</label>
+                            <input class="form-control"
+                                   type="text" id="inputCategoryName" />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword"> Allocate Amount</label>
+                            <input class="form-control"
+                                   type="text" id="inputAllocateAmount" />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword">Description</label>
+                            <input class="form-control"
+                                   type="text" id="inputDescription" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    @*<button type="submit" class="btn category_bgbutton">Save</button>*@
+                    <button class="btn category_bgbutton btn-success" id="SaveCategory">Save</button>
+                    <button type="button" class="btn category_bgbutton btn-danger"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade " tabindex="-1" id="AddCategory1" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content category_bg">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="inputCategoryName1">Category Name</label>
+                            <input class="form-control"
+                                   type="text" id="inputCategoryName1" />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputAllocateAmount1"> Allocate Amount</label>
+                            <input class="form-control"
+                                   type="text" id="inputAllocateAmount1" />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputDescription1">Description</label>
+                            <input class="form-control"
+                                   type="text" id="inputDescription1" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    @*<button type="submit" class="btn category_bgbutton">Save</button>*@
+                    <button class="btn category_bgbutton btn-success" id="SaveCategory1">Save</button>
+                    <button type="button" class="btn category_bgbutton btn-danger"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+
+

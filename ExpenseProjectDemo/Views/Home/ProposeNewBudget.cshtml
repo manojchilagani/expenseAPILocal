@@ -1,0 +1,319 @@
+﻿
+@{
+    ViewBag.Title = "ProposeNewBudget";
+}
+@{
+    if (Session["uid"] == null)
+    {
+        Response.Redirect("/Home/Login");
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+    <script>
+      
+        $(document).ready(function () {
+            var sessionValue = $("#hdnSession").data('value');
+            var val1;
+            var Sno = 1;
+            var d = new Date().getFullYear();
+            var a;
+            var year;
+            for (var i = 0; i <=2; i++) {
+                if (i == 0) {
+                    year = d + i;
+                    a += '<option value="' + year + '" selected>' + year + '</option>';
+                }
+                else {
+                    year = d + i;
+                    a += '<option value="' + year + '">' + year + '</option>';
+                }
+            }
+            $("#year1").html(a);
+       //< ---------------------------------------------------------------------------------------------------------------->
+
+            $("#CreateBudget").click(function () {
+                if ($("#inputBudgetName").val() == "") {
+                    alert("Budget Name cannot be Empty");
+                }
+                else {
+                     var B = {} ;
+                B.Budgetid = -1 ;
+                B.BudgetName = $("#inputBudgetName").val();
+                    B.Year = $("#year1").val();
+
+                    $.ajax({
+                        type: "Post",
+                        url: "http://10.145.8.188/ExpenseManagementAPI1/api/Budget",
+                        contentType: "application/json",
+                        crossDomain: true,
+                        dataType: "json",
+                        data: JSON.stringify(B),
+                        async: false,
+                        success: function (data) {
+                            val1 = data.Data;
+                           // alert(val1.Message);
+                          }
+                    });
+                     $("#d1").show();
+                    $("#d2").show();
+                }
+            })
+            $("#Propose").click(function () {
+                //alert(val1.Id);
+               //alert(sessionValue);
+                var s = {};
+                s.Id = -1;
+                s.Userid = -1;
+                s.Categoryid = -1;
+                s.Budgetid = val1.Id;
+                s.Expenseid = -1;
+                s.Alloted = false;
+                s.Saved = true;
+                 $.ajax({
+                     type: "PUT",
+                     url: "http://10.145.8.188/ExpenseManagementAPI1/api/ProposedBudget/"+val1.Id,
+                                contentType: "application/json",
+                                crossDomain: true,
+                                dataType: "json",
+                                data: JSON.stringify(s),
+                                async: false,
+                                success: function (data) {
+                                    alert("Saved Successfully");
+                                    window.location.href = "/Home/FirstPage";
+                     },
+                                error: function (data) {
+                                    alert("failure");
+                     }
+                            });
+            })
+      //< ---------------------------------------------------------------------------------------------------------------->
+            $("#Cancel").click(function () {
+                alert("Saved as draft");
+                window.location.href = "/Home/Draft" ;
+            })
+     //< ---------------------------------------------------------------------------------------------------------------->
+            // $("#Save_as_Draft").click(function () {
+            //     alert("The budget has been saved as draft");
+            //     location.reload();
+            //})
+      //< ---------------------------------------------------------------------------------------------------------------->
+            //here
+            $("#SaveCategory").click(function () {
+                    var C = {};
+                    C.Categoryid = -1;
+                    C.CategoryName = $("#inputCategoryName").val();
+                    C.AmountProposed = $("#inputAllocateAmount").val();
+                    C.Description = $("#inputDescription").val();
+                    //alert(sessionValue);
+                    $.ajax({
+                        type: "Post",
+                        url: "http://10.145.8.188/ExpenseManagementAPI1/api/Category",
+                        contentType: "application/json",
+                        crossDomain: true,
+                        dataType: "json",
+                        data: JSON.stringify(C),
+                        async: false,
+                        success: function (data) {
+                            var val = data.Data;
+                            //alert(val.Message );
+                            var PB = {};
+                            PB.Id = -1;
+                            PB.Userid = sessionValue;
+                            PB.Categoryid = val.Id;
+                            PB.Budgetid = val1.Id; 
+                            PB.Expenseid = null;
+                            PB.Alloted = false;
+                            PB.Saved = false;
+                            $.ajax({
+                                type: "Post",
+                                url: "http://10.145.8.188/ExpenseManagementAPI1/api/ProposedBudget",
+                                contentType: "application/json",
+                                crossDomain: true,
+                                dataType: "json",
+                                data: JSON.stringify(PB),
+                                async: false,
+                                success: function (data) {
+                                    alert("Category Added Successfully");
+                                    $("#tbody").append("<tr><td>" + Sno + "</td><td>" + C.CategoryName + "</td><td>" + C.AmountProposed + "</td><td>" + C.Description + "</td></tr>");
+                                    Sno++;
+                                    $("#inputCategoryName").val("");
+                                    $("#inputAllocateAmount").val("");
+                                    $("#inputDescription").val("");
+                                    $('#modal').modal('hide');
+                                }
+                            });
+
+                        }
+                    });
+
+
+        });
+     });
+    </script>
+
+    
+</head>
+<body style="background-color:#f0fbff;">
+
+    <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+
+            </div>
+            <div class="col-md-8">
+                <div class="container  ">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @*enter code*@
+                            <br />  <p class="text-right h4">Year</p><br />
+                            <p class="text-right h4">Report Name</p>
+                        </div>
+                        <div class="col-md-6 ">
+                            <div class="col-md-12">
+                                <br />
+                                <select class="form-control form-control-sm btn-primary inputWidth2" id="year1" style="padding-left:100px"></select>
+                                <br />
+                            </div>
+                            <div class="col-md-12">
+                                <input type="text" class="form-control  inputWidth2" id="inputBudgetName">
+                                @*<span class="input-group-btn">
+                                    <button class="btn btn-dark buttons" type="button" id="CreateBudget">Create Budget</button>
+                                </span>*@
+                            </div>
+                            <div class="col-md-12">
+
+                                <div class="col-md-3">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-dark buttons" type="button" id="CreateBudget">Create Report</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-2">
+
+            </div>
+        </div>
+
+        @*ksnn*@
+
+        <div class="row" Style="display:none; margin-left:70px" id="d1">
+            <div class="col-md-4">
+                <span class="input-group-btn">
+                    <button class="btn btn-info buttons" type="button" data-target="#AddCategory" data-toggle="modal" id="AddNewCategory">Add New Category</button>
+                </span>
+                <div class="modal fade " tabindex="-1" id="AddCategory" data-keyboard="false" data-backdrop="static">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content category_bg">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    &times;
+                                </button>
+
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="CN">Category Name</label>
+                                        <input class="form-control"
+                                               type="text" id="inputCategoryName" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="AA"> Allocate Amount</label>
+                                        <input class="form-control"
+                                               type="text" id="inputAllocateAmount" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="D">Description</label>
+                                        <input class="form-control"
+                                               type="text" id="inputDescription" />
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn category_bgbutton btn-success" id="SaveCategory">Save</button>
+                                <button type="button" class="btn category_bgbutton btn-danger"
+                                        data-dismiss="modal">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="col-md-3">
+                <span class="input-group-btn">
+                    <button class="btn btn-secondary buttons" type="button" id="Save_as_Draft">Save as Draft</button>
+                </span>
+
+            </div>*@
+            <div class="col-md-4">
+                <span class="input-group-btn">
+                    <button class="btn btn-success buttons" type="button" id="Propose">Save Report</button>
+                </span>
+
+            </div>
+            <div class="col-md-4">
+                <span class="input-group-btn">
+                    <button class="btn btn-danger buttons" type="button" id="Cancel">Cancel</button>
+                </span>
+            </div>
+        </div>
+
+
+
+        <div class="row" Style="display:none" id="d2">
+            <div class="col-md-12">
+                @*<div>
+                    <p>Note:1)If no Category is add to the created Expense, Report Cannot be Saved as Draft.</p>
+                </div>*@
+                <div class="customDiv2 table-responsive-md overflow-auto">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Category</th>
+                                <th>Amount Allocated</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody id="tbody">
+  
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
+
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+        </script>
+        <script src="bootstrap/js/bootstrap.min.js"></script>*@
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</body>
+</html>

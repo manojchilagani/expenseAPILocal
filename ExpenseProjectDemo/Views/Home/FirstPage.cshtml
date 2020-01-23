@@ -1,0 +1,196 @@
+﻿
+@{
+    ViewBag.Title = "ExpenseReport";
+}
+@{
+    if (Session["uid"] == null)
+    {
+        Response.Redirect("/Home/Login");
+    }
+}
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="~/Scripts/bootstrap.js"></script>
+<script src="~/Scripts/moment.js"></script>
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+<link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+<script src="~/Scripts/popper.js"></script>
+<script>
+    
+    $(document).ready(function () {
+        var info;
+        var info1;
+        var sessionValue = $("#hdnSession").data('value');
+        var d = new Date().getFullYear();
+        var a;
+        var year;
+        for (var i = 1; i >= -2; i--) {
+            if (i == 0) {
+                year = d - i;
+                a += '<option value="' + year + '" selected>' + year + '</option>';
+            }
+            else {
+                year = d - i;
+                a += '<option value="' + year + '">' + year + '</option>';
+            }
+        }
+        $("#year2").html(a);
+        $.ajax({
+            type: "Get",
+            url: "http://10.145.8.188/ExpenseManagementAPI1/api/Budget",
+            contentType: "application/json",
+            crossDomain: true,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                info = data.Data;
+                $.ajax({
+                    type: "Get",
+                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/"+sessionValue,
+                    contentType: "application/json",
+                    crossDomain: true,
+                    dataType: "json",
+                    async: false,
+                    success: function (data) {
+                        var f = 1;
+                        var l;
+                        info1 = data.Data;
+                        $.each(info, function (key, val) {
+                            if (val.Year == $("#year2").val()) {
+                                for (l = 0; l < data.Data.length; l++) {
+                                    if (data.Data[l].Budgetid == val.Budgetid) {
+                                        $("#tblbody").append("<tr><td>" + f + "</td><td> " + val.Budgetid + "</td><td> " + val.BudgetName + "</td><td class='h5'> " + data.Data[l].budget_totalSpent + "</td><td class='h5'>" + data.Data[l].totalBudget + "</td><td class='h5'>" + (data.Data[l].totalBudget - data.Data[l].budget_totalSpent) + "</td><td><button class='button10 btn btn-success buttons'  type='button' >Details</button> </td></tr>")
+                                        f++;
+                                        break;
+                                    }
+                                }
+                            }
+                        })
+                    }
+                });
+            }
+        });
+        $('.button10').click(function () {
+
+            var currow = $(this).closest('tr');
+            var id = currow.find('td:eq(1)').text();
+            //alert(id);
+
+            //window.location.href = "/Expense/Home/" + id;
+            window.location.href = "/Home/FirstPage/" + id;
+        });
+        $("#year2").change(function () {
+            var g = 1;
+            //alert(info.length + "  " + info1.length);
+            $("#tblbody").empty();
+            $.each(info, function (key, val) {
+                if (val.Year == $("#year2").val()) {
+                    for (l = 0; l < info1.length; l++) {
+                        if (info1[l].Budgetid == val.Budgetid) {
+                            $("#tblbody").append("<tr><td>" + g + "</td><td> " + val.Budgetid + "</td><td> " + val.BudgetName + "</td><td class='h5'> " + info1[l].budget_totalSpent + "</td><td class='h5'>" + info1[l].totalBudget + "</td><td class='h5'>" + (info1[l].totalBudget - info1[l].budget_totalSpent) + "</td><td><button class='button10 btn btn-success buttons'  type='button' >Details</button> </td></tr>")
+                            g++;
+                            break;
+                        }
+                    }
+                }
+            });
+            $('.button10').click(function () {
+
+                var currow = $(this).closest('tr');
+                var id = currow.find('td:eq(1)').text();
+                //alert(id);
+                var selectedYear = $("#year2").val();
+
+                if (selectedYear != null || selectedYear != "")
+                    selectedYear = "?year=" + selectedYear;
+                else
+                    selectedYear = "";
+                //window.location.href = "/Expense/Home/" + id;
+                window.location.href = "/Home/FirstPage/" + id + selectedYear;
+            });
+        });
+
+    });
+    function getBudget(h) {
+
+        // var currow = $(this).closest('tr');
+        var id = h //currow.find('td:eq(1)').text();
+        var selectedYear = $("#year2").val();
+
+        if (selectedYear != null || selectedYear != "")
+            selectedYear = "?year=" + selectedYear;
+        else
+            selectedYear = "";
+
+        //window.location.href = "/Expense/Home/" + id;
+        window.location.href = "/Home/FirstPage/" + id + selectedYear;
+    };
+</script>
+<body>
+    <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+
+            </div>
+            <div class="col-md-8">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @*enter code*@
+                            <br />  <p class="text-center h4">Year</p><br />
+
+                        </div>
+                        <div class="col-md-6 ">
+                            <div class="col-md-12">
+                                <br />
+                                <select class="form-control form-control-sm btn-primary inputWidth1" id="year2" name="Year2"></select>
+                                <br />
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-2">
+
+            </div>
+        </div>
+
+        @*ksnn*@
+
+
+
+        <div class="row">
+            <div class="col-md-10 offset-1">
+
+                <div class="customDiv2 table-responsive-sm overflow-auto" style="margin-left:20px ; margin-right:20px ;margin-top:30px">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Report Id</th>
+                                <th>Expense Report</th>
+                                <th>Amount Spent</th>
+                                <th>Budget</th>
+                                <th>Amount Available</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody id="tblbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </div>
+
+
+</body>
