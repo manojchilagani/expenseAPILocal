@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewBag.Title = "Profile1";
+}
+@{
+    if (Session["uid"] == null)
+    {
+        Response.Redirect("/Home/Login");
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="~/Scripts/bootstrap.js"></script>
+    <link href="~/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+
+    <script>
+        $(document).ready(function () {
+            //alert("hey");
+
+            var sessionValue = $("#hdnSession").data('value');
+            $.ajax({
+                type: "Get",
+                url: "http://10.145.8.188/ExpenseManagementAPI1/api/User/" + sessionValue,
+                contentType: "application/json",
+                crossDomain: true,
+                dataType: "json",
+                async: false,
+                success: function (data) {
+
+
+                    if (data.Data != null) {
+                        // alert(data.Data.Userid);
+                        $("#FirstName").text(data.Data.FirstName);
+                        $("#LastName").text(data.Data.LastName);
+                        $("#UserName").text(data.Data.UserName);
+                        //window.location.href = "/Home/Profile1";
+
+                    }
+                },
+                error: function (msg) {
+                    alert("sorry we encountered trouble");
+                }
+            });
+
+        });
+    </script>
+
+</head>
+<body>
+    <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
+
+    <div class="bg-img">
+        <div class="container">
+            <div id="ProfileBox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <div class="panel-title text-center">Profile</div>
+                    </div>
+
+                    <div style="padding-top:30px" class="panel-body">
+
+                        <form id="ProfilForm" class="form-horizontal" role="form">
+
+                            <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
+                                First Name:
+                            </div>
+                            <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px;font-family:Arial;font-size:large" class="input-group">
+                                <label id="FirstName" type="text" class="form-control col-md-9" style="font-size:15px"/>
+                            </div>
+
+                            <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
+                                Last Name:
+                            </div>
+                            <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px" class="input-group">
+                                <label id="LastName" type="text" class="form-control col-md-9" style="font-size:15px" />
+                            </div>
+
+                            <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
+                                Phone No:
+                            </div>
+                            <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px" class="input-group">
+                                <label id="UserName" type="text" class="form-control col-md-9" style="font-size:15px"/>
+                            </div>
+                            @*<div style="margin-top:10px;margin-left:50px" class="form-group ">
+            <div class="col-sm-12 controls" align="center">
+                <button id="btn-logout" class="btn btn-success text-sm-center">Logout</button>
+            </div>
+        </div>*@
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -7,23 +7,64 @@
     <script src="~/Scripts/jquery-3.4.1.js"></script>
     <script src="~/Scripts/bootstrap.js"></script>
     <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+    <style>
+        body 
+        {
+          margin: 0;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topnav {
+          overflow: hidden;
+          background-color: #333;
+        }
+
+        .topnav a {
+          float: left;
+          color: #f2f2f2;
+          text-align:initial;
+          padding: 5px 5px;
+          text-decoration: none;
+          font-size: 5px;
+        }
+        .topnav h3 {
+          float: left;
+          color: #f2f2f2;
+          text-align:initial;
+          padding: 5px 5px;
+          text-decoration: none;
+          font-size: 30px;
+        }
+
+    </style>
 </head>
 <body>
+    @*<div class="topnav">
+            <center>
+                <p class="h2 text-white-50" style="padding:5px">Expense Planner</p>
+            </center>
+        </div>*@
     <div class="topnav">
-
-        <div class="btn-group">
+        <div>
             <a class="btn btn-dark" href="/Home/Firstpage">Home</a>
-            @*<a class="btn btn-info" href="/Home/Index">Main</a>*@
             <a class="btn btn-primary" href="/Home/ProposeNewBudget">Create New Report</a>
             <a class="btn btn-secondary" href="/Home/Draft">Drafts</a>
-            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-            <p class="h2 text-white" style="padding:5px">Expense Planner</p>
-           
-        </div>
-        
-        <a class="btn btn-success" href="/Home/Logout" style="float:right;">Logout</a>
+                <h3 class="text-white-50" >
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    Expense Planner
+                </h3>
 
+           
+            
+            <a class="btn btn-success" href="/Home/Logout"  style="float:right;">Logout</a>
+            <a class="btn btn-info" href="/Home/Profile1" style="float:right;">Profile</a>
+        </div>
+       
     </div>
+
+ 
+
+
     <div>
         @RenderBody()
     </div>

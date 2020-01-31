@@ -37,6 +37,15 @@ namespace ExpenseProjectDemo.Controllers
         {
             return View();
         }
+        public ActionResult Profile1()
+        {
+            return View();
+        }
+        public ActionResult GraphPage()
+        {
+            return View("GraphPage");
+        }
+
 
         [HttpGet]
         public ActionResult Sessionvalidate(string sesssion)
@@ -77,6 +86,8 @@ namespace ExpenseProjectDemo.Controllers
                 return View("ProposeNewBudget");
             }
         }
+
+       
         //public ActionResult ProposeNewBudget1(int? bid)
         //{
         //    //JsonResult Budgetid = new JsonResult { Data = bid };

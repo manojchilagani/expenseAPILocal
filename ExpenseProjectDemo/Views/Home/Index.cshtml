@@ -123,8 +123,6 @@
                         //alert(tb);
                         remaining=remaining+rem;
                     }
-
-
                 })
                 //alert(bts);
                 document.getElementById("L1").innerHTML =bts;
@@ -251,7 +249,7 @@
                     $("#CategoryName").empty();
                     $("#CategoryName").append("<option>Select Category</option>")
                     $.each(data.Data, function (key, val) {
-                        if (val.Budgetid==bid) {
+                        if (val.Budgetid==bid) {    
                             var rem = val.AmountProposed - val.totalspent;
                             $("#CategoryName").append('<option value="' + rem + ',' + val.Categoryid + '">' + val.CategoryName + '</option>');
                         }
