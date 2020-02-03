@@ -97,8 +97,7 @@
         var q=0;
         var bts=0;
         var tb=0;
-        var remaining = 0;
-        var bname;
+        var remaining=0;
         document.getElementById("yeardisplay").innerHTML = syear;
         $.ajax({
             type: "Get",
@@ -109,10 +108,10 @@
             async: false,
             success: function (data) {
                 var i = 1;
+
                 $.each(data.Data, function (key, val) {
                     //alert(val.budget_totalSpent);
                     if (val.Budgetid == bid) {
-                        bname = val.BudgetName;
                         var rem = val.AmountProposed - val.totalspent;
                         $("#tbldata").append("<tr><td>" + i + "</td><td> " + val.CategoryName + "</td><td> " + val.AmountProposed + "</td><td> " + val.totalspent + "</td><td> " + rem + "</td><td><button id='btnID" + val.Categoryid + "' type='button' class='btn btn-success' onclick='Display(" + val.Categoryid + "," + sessionValue + ");'>Expenses</button>  <button class='btn btn-info' type='button' onclick='getCategory(" + val.Categoryid +","+val.totalspent+ ")'>Edit</button></td></tr>")
                         i++;
@@ -126,9 +125,7 @@
                     }
                 })
                 //alert(bts);
-                document.getElementById("L1").innerHTML = bts;
-                document.getElementById("BN").innerHTML = bname;
-
+                document.getElementById("L1").innerHTML =bts;
                 document.getElementById("L2").innerHTML =q;
                 document.getElementById("L3").innerHTML =remaining;
             }
@@ -357,9 +354,6 @@
                         <div class="col-md-3">
                             @*enter code*@
                             <br />  <p class="text-center h4">Year :<label class="text-center h4" style="color:#999999;" id="yeardisplay">  </label></p><br />
-                        </div>
-                        <div class="col-md-6">
-                            <br /> <p class="text-center h4">  Report Name :<label class="text-center h4" style="color:#999999;" id="BN">  </label> </p><br />
                         </div>
                         @*<div class="col-md-6 ">
                                 <div class="col-md-12">
