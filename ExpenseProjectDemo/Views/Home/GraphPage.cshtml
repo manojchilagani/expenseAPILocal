@@ -8,45 +8,48 @@
 
 <html>
 <head>
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
+
         google.charts.load("current", { packages: ["corechart"] });
         google.charts.setOnLoadCallback(drawChart);
+        var q = 0;
+        var bts = 0;
+        var tb = 0;
+        var remaining = 0;
+        $(document).ready(function () {
+            $.ajax({
+                type: "Get",
+                url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/12",
+                contentType: "application/json",
+                crossDomain: true,
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $.each(data.Data, function (key, val) {
+                        if (val.Budgetid == 1112) {
+                            var rem = val.AmountProposed - val.totalspent;
+                            q += val.AmountProposed;
+                            bts = val.budget_totalSpent;
+                            tb = val.totalBudget;
+                            remaining = remaining + rem;
+                        }
+                    })
+                }
+            })
+            alert(bts);
+            alert(remaining);
+            drawChart(bts, remaining);
+        });
 
-        //$(document).ready(function () {
-        //     $.ajax({
-        //        type: "Get",
-        //        url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/12",
-        //        contentType: "application/json",
-        //        crossDomain: true,
-        //        dataType: "json",
-        //        async: false,
-        //         success: function (data) {
-        //             alert();
-        //              $.each(data.Data, function (key, val) {
-        //                  if (val.Budgetid == 1112) {
-        //                      var rem = val.AmountProposed - val.totalspent;
-        //                      q += val.AmountProposed;
-        //                      bts = val.budget_totalSpent;
-        //                      tb = val.totalBudget;
-        //                      remaining = remaining + rem;
-        //                  }
-        //              })
-        //              alert(bts);
-        //          }
-        //        })
-
-        //    drawChart();
-        //});
-
-        function drawChart() {
-          //alert("1")
-            var a = 112;
-            var b = 29;
+        function drawChart(i, j) {
+            var a = i;
+            var b = j;
             var data = google.visualization.arrayToDataTable([
-                ['Type', 'money'],
                 ['spent', a],
-                ['remaining', b],
+                ['remaining', b]
             ]);
             var options = {
                 title: 'My Expenses',
@@ -65,5 +68,4 @@
 
     <div id="donutchart" style="width: 500px; height: 400px;"></div>
 </body>
-</html>
 </html>
