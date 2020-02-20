@@ -49,14 +49,15 @@
 
 
             $("#btn-signup").click(function (e) {
-                e.preventDefault();
+               // alert("alert");
+               // e.preventDefault();
                 var usr = {};
                 usr.userid = $("#UserId").val();
                 usr.firstname = $("#FName").val();
                 usr.lastname = $("#LName").val();
                 usr.username = $("#UN").val();
                 usr.password = $("#Pwd").val();
-
+                
                     $.ajax({
                         type: 'POST',
                         url: 'http://10.145.8.188/ExpenseManagementAPI1/api/user',
@@ -66,7 +67,7 @@
                             'Content-Type': 'application/json'
                         },
                         success: function (data) {
-                            //alert(data.Data);
+                           // alert(data.Data );
                             if (data.Data != null) {
                                 window.location.href = "/Home/Login";
 

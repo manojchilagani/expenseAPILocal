@@ -10,7 +10,9 @@
 <script src="~/Scripts/moment.js"></script>
 <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
 <link href="~/Content/bootstrap.css" rel="stylesheet" />
-<script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+
     var bid=@ViewData["bid"];
     var syear=@ViewData["selectedyear"];
     var cat=0;
@@ -89,7 +91,10 @@
             }
         });
     };
-    $(document).ready(function () {
+    google.charts.load("current", { packages: ["corechart"] });
+
+    $(document).ready(function ()
+    {
         //alert(bid);
         var sessionValue = $("#hdnSession").data('value');
         //alert(sessionValue);
@@ -102,7 +107,7 @@
         document.getElementById("yeardisplay").innerHTML = syear;
         $.ajax({
             type: "Get",
-            url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/"+sessionValue,
+            url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/" + sessionValue,
             contentType: "application/json",
             crossDomain: true,
             dataType: "json",
@@ -115,24 +120,26 @@
                     if (val.Budgetid == bid) {
                         bname = val.BudgetName;
                         var rem = val.AmountProposed - val.totalspent;
-                        $("#tbldata").append("<tr><td>" + i + "</td><td> " + val.CategoryName + "</td><td> " + val.AmountProposed + "</td><td> " + val.totalspent + "</td><td> " + rem + "</td><td><button id='btnID" + val.Categoryid + "' type='button' class='btn btn-success' onclick='Display(" + val.Categoryid + "," + sessionValue + ");'>Expenses</button>  <button class='btn btn-info' type='button' onclick='getCategory(" + val.Categoryid +","+val.totalspent+ ")'>Edit</button></td></tr>")
+                        $("#tbldata").append("<tr><td>" + i + "</td><td> " + val.CategoryName + "</td><td> " + val.AmountProposed + "</td><td> " + val.totalspent + "</td><td> " + rem + "</td><td><button id='btnID" + val.Categoryid + "' type='button' class='btn btn-success' onclick='Display(" + val.Categoryid + "," + sessionValue + ");'>Expenses</button>  <button class='btn btn-info' type='button' onclick='getCategory(" + val.Categoryid + "," + val.totalspent + ")'>Edit</button></td></tr>")
                         i++;
-                        q+=val.AmountProposed;
-                        bts=val.budget_totalSpent;
+                        q += val.AmountProposed;
+                        bts = val.budget_totalSpent;
                         //alert(bts);
-                        tb=val.totalBudget;
+                        tb = val.totalBudget;
                         //alert(bts);
                         //alert(tb);
-                        remaining=remaining+rem;
+                        remaining = remaining + rem;
                     }
-                })
+                });
+                google.charts.setOnLoadCallback(function () { drawChart(bts, remaining); });
                 //alert(bts);
-                document.getElementById("BN").innerHTML =bname;
-                document.getElementById("L1").innerHTML =bts;
+                document.getElementById("BN").innerHTML = bname;
+                document.getElementById("L1").innerHTML = bts;
                 document.getElementById("L2").innerHTML = q;
-                document.getElementById("L3").innerHTML =remaining;
+                document.getElementById("L3").innerHTML = remaining;
             }
-        })
+        });
+
 
         //<------------------------------------------------------------------------------------------>
         $("#SaveCategory").click(function () {
@@ -218,7 +225,6 @@
 
                 location.reload();
             }
-
         });
         $("#SaveExpenseAdd").click(function () {
             if(Save()=="true")
@@ -252,7 +258,7 @@
                     $("#CategoryName").empty();
                     $("#CategoryName").append("<option>Select Category</option>")
                     $.each(data.Data, function (key, val) {
-                        if (val.Budgetid==bid) {    
+                        if (val.Budgetid==bid) {
                             var rem = val.AmountProposed - val.totalspent;
                             $("#CategoryName").append('<option value="' + rem + ',' + val.Categoryid + '">' + val.CategoryName + '</option>');
                         }
@@ -281,7 +287,7 @@
             //if(as == NaN || ar == NaN) {alert("Enter valid num."); return;}
             //alert(((as)>=(ar)) +"  "+as+">="+ar);
             //alert(as);
-            
+
             if(ar>= as && ($("#AmountSpent").val()!=""))
             {
                 //alert("entered");
@@ -341,39 +347,64 @@
         }
         //<------------------------------------------------------------------------------------------>
     });
+     function drawChart(a, b)
+        {
+            
+            var data = google.visualization.arrayToDataTable([
+                ['Type', '$', { role: "style" }],
+                ['Spent', a, '#f2120f'],
+                ['Available',b, '#23c418'],
+            ]);     
+            var options = {
+                title: 'Report Budget',
+                bar: {groupWidth: "75%"},
+                legend: { position: "none" },
+                isStacked: true
+                //pieHole: 0,
+                //is3D: true
+            };
+
+            var chart = new google.visualization.BarChart(document.getElementById('donutchart'));
+            chart.draw(data, options);
+        }
+
 </script>
 
 <body>
     <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
 
     <div class="container-fluid">
+        <div class="panel-heading">
+            <center>
+                <h4 class="text-black-50" style="padding:5px">Category Page</h4>
+            </center>
+        </div>
         <div class="row">
-            <div class="col-md-2">
-
-            </div>
-            <div class="col-md-8">
+            <div class="col-md-9">
                 <div class="container  ">
                     <div class="row">
-                        <div class="col-md-3">
-                            @*enter code*@
-                            <br />  <p class="text-center h4">Year :<label class="text-center h4" style="color:#999999;" id="yeardisplay">  </label></p><br />
+                        <div class="col-sm-2">
                         </div>
-                        <div class="col-md-6">
-                            <br /> <p class="text-center h4">  Report Name :<label class="text-center h4" style="color:#999999;" id="BN">  </label> </p><br />
+                        <div class="col-sm-3">
+                            <br />  <p class="text-left h4">Year :<label class="text-center h4" style="color:#999999;" id="yeardisplay">  </label></p><br />
                         </div>
+                        <div class="col-sm-6">
+                            <br /> <p class="text-md-center h4">Report Name :<label class="text-center h4" style="color:#999999;" id="BN">  </label> </p><br />
+                        </div>
+
                     </div>
-
                 </div>
-
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="col-md-12 ">
                     <br />
-                    <button class="btn btn-dark   float-md-right " type="button" data-target="#AddExpense" data-toggle="modal" id="AddExpenseButton">Add Expense</button>
+                    <button class="text-right btn btn-dark   float-md-right " type="button" data-target="#AddExpense" data-toggle="modal" id="AddExpenseButton">Add Expense</button>
                 </div>
             </div>
-
         </div>
+    </div>
+    <div class="col-sm-12">
+        <P class="text-center h4"><label id="donutchart" style="width: 450px; height: 100px;"> </label> </P>
     </div>
     @*ksnn*@
     <div class="row">
@@ -423,16 +454,16 @@
         <div class="col-md-2"></div>
         <div class="col-md-1"><label class="h5">@*&emsp;&emsp;&ensp;*@ TOTAL:</label></div>
         <div class="col-md-2 text-center">&emsp;<label class="h5 " style="color:cornflowerblue;" id="L2"></label></div>
-        <div class="col-md-2 text-center "><label class="h5" style="color:#23c418;" id="L1"> </label></div>
+        <div class="col-md-2 text-center "><label class="h5" style="color:#f2120f;" id="L1"> </label></div>
         @*<div class="col-md-2"></div>*@
-        <div class="col-md-2 text-center"><label class="h5" style="color:#f2120f;" id="L3"> </label></div>
+        <div class="col-md-2 text-center"><label class="h5" style="color:#23c418;" id="L3"> </label></div>
         <div class="col-md-3"></div>
     </div>
     <div class="row ">
         <div class="col-md-12">
             <div class="offset-md-10">
                 <br />
-                <button class="btn btn-success  float-md-right" style="margin-right:20px" type="button" data-target="#AddCategory" data-toggle="modal">Add Category</button>
+                <button class=" btn btn-success  float-md-right" style="margin-right:20px" type="button" data-target="#AddCategory" data-toggle="modal">Add Category</button>
             </div>
         </div>
 

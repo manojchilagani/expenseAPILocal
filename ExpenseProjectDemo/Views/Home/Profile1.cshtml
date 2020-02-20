@@ -15,18 +15,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <script src="~/Scripts/popper.js"></script>
     <script src="~/Scripts/jquery-3.4.1.js"></script>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="~/Scripts/bootstrap.js"></script>
-    <link href="~/css/font-awesome.min.css" rel="stylesheet" />
-    <link href="~/Content/bootstrap.css" rel="stylesheet" />
-    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/moment.js"></script>
     <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
-
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <style>
+        form {
+            width: 500px;
+            padding: 50px;
+            border: 5px solid gray;
+            margin: auto;
+        }
+    </style>
     <script>
         $(document).ready(function () {
-            //alert("hey");
-
             var sessionValue = $("#hdnSession").data('value');
             $.ajax({
                 type: "Get",
@@ -36,71 +40,159 @@
                 dataType: "json",
                 async: false,
                 success: function (data) {
-
-
                     if (data.Data != null) {
                         // alert(data.Data.Userid);
                         $("#FirstName").text(data.Data.FirstName);
                         $("#LastName").text(data.Data.LastName);
                         $("#UserName").text(data.Data.UserName);
+
                         //window.location.href = "/Home/Profile1";
 
+                $("#inputFirstName").val(data.Data.FirstName);
+                $("#inputLastName").val(data.Data.LastName);
+                $("#inputUserName").val(data.Data.UserName);
                     }
                 },
                 error: function (msg) {
                     alert("sorry we encountered trouble");
                 }
             });
-
+            $("#SaveCategory1").click(function () {
+                var C1 = {};
+                C1.Userid = sessionValue;
+                C1.FirstName = $("#inputFirstName").val();
+                C1.LastName = $("#inputLastName").val();
+                C1.UserName = $("#inputUserName").val();
+                //C1.Paswword = "123#";
+                $.ajax({
+                    type: "Put",
+                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/user/" + sessionValue,
+                    contentType: "application/json",
+                    crossDomain: true,
+                    dataType: "json",
+                    data: JSON.stringify(C1),
+                    
+                    async: false,
+                    success: function (data) {
+                        alert("Saved Successfully");
+                        //alert(data.Data);
+                    },
+                    error: function (msg) {
+                        alert("failed");
+                    }
+                });
+                location.reload();
+            });
         });
     </script>
-
 </head>
+
 <body>
     <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
+        <div class="panel-heading">
+            <center>
+                <h4 class="text-black-50" style="padding:5px">Profile</h4>
+            </center>
+        </div>
 
-    <div class="bg-img">
-        <div class="container">
-            <div id="ProfileBox" style="margin-top:50px;" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <div class="panel-title text-center">Profile</div>
-                    </div>
+        <div  style="padding-top:10px;margin:auto" class=" panel-body">
+            <form id="ProfilForm" class="form-horizontal" role="form">
+                <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
+                    First Name:
+                </div>
+                <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px;font-family:Arial;font-size:large" class="input-group">
+                    <label id="FirstName" type="text" class="form-control col-md-9" style="font-size:15px" />
+                </div>
 
-                    <div style="padding-top:30px" class="panel-body">
+                <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
+                    Last Name:
+                </div>
+                <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px" class="input-group">
+                    <label id="LastName" type="text" class="form-control col-md-9" style="font-size:15px" />
+                </div>
 
-                        <form id="ProfilForm" class="form-horizontal" role="form">
+                <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
+                    Phone No:
+                </div>
+                <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px" class="input-group">
+                    <label id="UserName" type="text" class="form-control col-md-9" style="font-size:15px" />
+                </div>
 
-                            <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
-                                First Name:
-                            </div>
-                            <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px;font-family:Arial;font-size:large" class="input-group">
-                                <label id="FirstName" type="text" class="form-control col-md-9" style="font-size:15px"/>
-                            </div>
+                @*<div style="margin-top:10px;margin-left:50px" class="form-group ">
+                        <div class="col-sm-12 controls" align="center">
+                            <button id="btn-logout" class="btn btn-success text-sm-center">Logout</button>
+                        </div>
+                    </div>*@
+            </form>
+        </div>
+        <div class="text-center">
+            @*<button class="text-center btn btn-success" type="button" data-target="#Update" data-toggle="modal" id="AddExpenseButton">Edit & Update</button>*@
+            <br/>
+            <button class="text-center btn btn-dark" type="button" data-target="#Update" data-toggle="modal"
+                    style="height:auto;width:auto;background-color:lightslategray;color:white;font-size:large" id="AddExpenseButton" @*onclick='Display();'*@>
+                Edit / Update
+            </button>
+            @*<button class="text-center btn btn-dark" type="button" data-toggle="modal" data-target="#Update" id="EditUpdate"
+                style="height:auto;width:auto;background-color:lightslategray;color:white;font-size:large">Edit & Update </button>*@
+        </div>
+         
+    <div class="modal fade " tabindex="-1" id="Update" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content category_bg">
+                <div class="modal-header">
+                    <center class="text-center">
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        Edit / Update
+                    </center>
+                        
+                           
 
-                            <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
-                                Last Name:
-                            </div>
-                            <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px" class="input-group">
-                                <label id="LastName" type="text" class="form-control col-md-9" style="font-size:15px" />
-                            </div>
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
 
-                            <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
-                                Phone No:
-                            </div>
-                            <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px" class="input-group">
-                                <label id="UserName" type="text" class="form-control col-md-9" style="font-size:15px"/>
-                            </div>
-                            @*<div style="margin-top:10px;margin-left:50px" class="form-group ">
-            <div class="col-sm-12 controls" align="center">
-                <button id="btn-logout" class="btn btn-success text-sm-center">Logout</button>
-            </div>
-        </div>*@
-                        </form>
-                    </div>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="inputFirstName">First Name</label>
+                            @*<select class="form-control" id="CategoryName"></select>*@
+                            <input class="form-control"
+                                type="text" id="inputFirstName" />
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="inputLastName"> Last Name</label>
+                            <input class="form-control"
+                                   type="text" id="inputLastName" />
+                        </div>
+                        <div class="form-group">
+                            <label for="inputUserName">Phone Number</label>
+                            <input class="form-control"
+                                   type="text" id="inputUserName" />
+                        </div>
+                        @*<div class="form-group">
+                            <label for="Comment">Comment</label>
+                            <input class="form-control"
+                                   type="text" id="Comment" />
+                        </div>*@
+                    </form>
+                </div>
+                <div class="modal-footer" style="margin:auto">
+                    <button class="btn category_bgbutton btn-success" style="width:125px;" id="SaveCategory1">Save</button>
+                    <button type="button" class="btn category_bgbutton btn-danger" style="width:125px;"
+                            data-dismiss="modal" id="Expensecancel">Cancel</button>
                 </div>
             </div>
         </div>
+                
     </div>
+
+
 </body>
 </html>

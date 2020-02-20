@@ -16,7 +16,8 @@
 <script src="~/Scripts/popper.js"></script>
 <script>
     
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         var info;
         var info1;
         var sessionValue = $("#hdnSession").data('value');
@@ -58,7 +59,7 @@
                             if (val.Year == $("#year2").val()) {
                                 for (l = 0; l < data.Data.length; l++) {
                                     if (data.Data[l].Budgetid == val.Budgetid) {
-                                        $("#tblbody").append("<tr><td>" + f + "</td><td> " + val.Budgetid + "</td><td> " + val.BudgetName + "</td><td class='h5'> " + data.Data[l].budget_totalSpent + "</td><td class='h5'>" + data.Data[l].totalBudget + "</td><td class='h5'>" + (data.Data[l].totalBudget - data.Data[l].budget_totalSpent) + "</td><td><button class='button10 btn btn-success buttons'  type='button' >Details</button> </td></tr>")
+                                        $("#tblbody").append("<tr><td>" + f + "</td><td> " + val.Budgetid + "</td><td> " + val.BudgetName + "</td><td class='h5'> " + data.Data[l].totalBudget+ "</td><td class='h5'>" + data.Data[l].budget_totalSpent + "</td><td class='h5'>" + (data.Data[l].totalBudget - data.Data[l].budget_totalSpent) + "</td><td><button class='button10 btn btn-success buttons'  type='button' >Details</button> </td></tr>")
                                         f++;
                                         break;
                                     }
@@ -128,9 +129,12 @@
 <body>
     <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
     <div class="container-fluid">
-        <center>
-            <h4 class="text-black-50" style="padding:5px">Home</h4>
-        </center>
+       
+        <div class="panel-heading">
+            <center>
+                <h4 class="text-black-50" style="padding:5px">Home</h4>
+            </center>
+        </div>
         <div class="row">
             <div class="col-md-2">
 
@@ -174,9 +178,9 @@
                             <tr>
                                 <th>S.No</th>
                                 <th>Report Id</th>
-                                <th>Expense Report</th>
-                                <th>Amount Spent</th>
-                                <th>Budget</th>
+                                <th>Expense Report Name</th>
+                                <th>Alloted Budget</th>
+                                <th>Amount Spent </th>
                                 <th>Amount Available</th>
                                 <th>Details</th>
                             </tr>

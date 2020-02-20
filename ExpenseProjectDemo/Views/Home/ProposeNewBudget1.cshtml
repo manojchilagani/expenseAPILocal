@@ -24,7 +24,9 @@
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/Styles/BootStrap1.css" rel="stylesheet" />
+    @*<link href="~/Styles/BootStrap1.css" rel="stylesheet" />*@
+    <link href="~/Styles/CustomStyles.css" rel="stylesheet" />
+
 
     <script>
         var Sno = 1;
@@ -57,7 +59,7 @@
                                 // below userid needs to be changed
                             if ((data.Data[j].Budgetid == bid) && (data.Data[j].Saved == false || data.Data[j].Saved == 0 || data.Data[j].Saved == "False")) {
                                 viewdata1.push({ "cn": data.Data[j].CategoryName, "amt": data.Data[j].AmountProposed, "desc": data.Data[j].Description })
-                            
+
                                 if(k==0){
                                     $("#inputYear").val(data.Data[j].Year);
                                     $("#inputBudgetName").val(data.Data[j].BudgetName);
@@ -68,7 +70,7 @@
                         //alert(viewdata1[0]["bid"]);
                        // alert(viewdata1.length)
                         var z = 0;
-                        
+
                         for (z = 0; z < viewdata1.length; z++)
                         {
                             $("#tbody").append("<tr><td>" + Sno + "</td><td> " + viewdata1[z]["cn"] + "</td><td> " + viewdata1[z]["amt"] + "</td><td>"+viewdata1[z]["desc"]+"</td></tr>")
@@ -76,7 +78,7 @@
                         }
                 }
             })
-       
+
             $("#Propose").click(function () {
                 //alert(bid);
                 var s = {};
@@ -137,7 +139,7 @@
                         PB.Id = -1;
                         PB.Userid = sessionValue;
                         PB.Categoryid = val.Id;
-                        PB.Budgetid = bid; 
+                        PB.Budgetid = bid;
                         PB.Expenseid = null;
                         PB.Alloted = false;
                         PB.Saved = false;
@@ -171,6 +173,11 @@
 
     <input type="hidden" id="hdnSession" data-value="@Request.RequestContext.HttpContext.Session["uid"]" />
     <div class="container-fluid">
+        <div class="panel-heading">
+            <center>
+                <h4 class="text-black-50" style="padding:5px">Create New Report</h4>
+            </center>
+        </div>
         <div class="row">
             <div class="col-md-2">
 
@@ -187,7 +194,7 @@
                             <div class="col-md-12">
                                 <br />
                                 @*<select class="form-control form-control-sm btn-primary inputWidth2" id="year1" style="padding-left:100px">
-                                    </select>*@
+                                </select>*@
                                 <input type="text" class="form-control  inputWidth2" id="inputYear">
                                 <br />
                             </div>
@@ -196,12 +203,12 @@
                                 <br />
                             </div>
                             @*<div class="col-md-12">
-                                    <div class="col-md-3">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-dark buttons" type="button" id="CreateBudget">Create Budget</button>
-                                        </span>
-                                    </div>
-                                </div>*@
+                                <div class="col-md-3">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-dark buttons" type="button" id="CreateBudget">Create Budget</button>
+                                    </span>
+                                </div>
+                            </div>*@
                         </div>
                     </div>
 
@@ -297,11 +304,11 @@
 
                         <tbody id="tbody">
                             @*<tr>
-                                    <td>1</td>
-                                    <td>Training</td>
-                                    <td>100000</td>
-                                    <td>fresher's training</td>
-                                </tr>*@
+                                <td>1</td>
+                                <td>Training</td>
+                                <td>100000</td>
+                                <td>fresher's training</td>
+                            </tr>*@
 
                         </tbody>
                     </table>
@@ -319,7 +326,7 @@
     @*@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
         </script>
         <script src="bootstrap/js/bootstrap.min.js"></script>*@
-    @*<script src="~/Scripts/jquery-3.4.1.min.js"></script>
-    <script src="~/Scripts/bootstrap.min.js"></script>*@
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
 </body>
 </html>
