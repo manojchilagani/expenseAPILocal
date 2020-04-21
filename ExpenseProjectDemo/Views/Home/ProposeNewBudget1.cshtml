@@ -39,7 +39,7 @@
             //alert(bid);
             $.ajax({
                 type: "Get",
-                url: "http://10.145.8.188/ExpenseManagementAPI1/api/ExpenseMgmtView/"+sessionValue,
+                url: "http://10.168.240.144:88/api/ExpenseMgmtView/"+sessionValue,
                 contentType: "application/json",
                 crossDomain: true,
                 dataType: "json",
@@ -91,7 +91,7 @@
                 s.Saved = true;
                 $.ajax({
                     type: "Put",
-                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/ProposedBudget/" + bid,
+                    url: "http://10.168.240.144:88/api/ProposedBudget/" + bid,
                     contentType: "application/json",
                     crossDomain: true,
                     dataType: "json",
@@ -126,7 +126,7 @@
                 C.Description = $("#inputDescription").val();
                 $.ajax({
                     type: "Post",
-                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/Category",
+                    url: "http://10.168.240.144:88/api/Category",
                     contentType: "application/json",
                     crossDomain: true,
                     dataType: "json",
@@ -145,7 +145,7 @@
                         PB.Saved = false;
                         $.ajax({
                             type: "Post",
-                            url: "http://10.145.8.188/ExpenseManagementAPI1/api/ProposedBudget",
+                            url: "http://10.168.240.144:88/api/ProposedBudget",
                             contentType: "application/json",
                             crossDomain: true,
                             dataType: "json",

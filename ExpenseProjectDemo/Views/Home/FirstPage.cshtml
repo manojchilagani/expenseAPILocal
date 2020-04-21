@@ -37,7 +37,7 @@
         $("#year2").html(a);
         $.ajax({
             type: "Get",
-            url: "http://10.145.8.188/ExpenseManagementAPI1/api/Budget",
+            url: "http://10.168.240.144:88/api/Budget",
             contentType: "application/json",
             crossDomain: true,
             dataType: "json",
@@ -46,7 +46,7 @@
                 info = data.Data;
                 $.ajax({
                     type: "Get",
-                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/HomeView/"+sessionValue,
+                    url: "http://10.168.240.144:88/api/HomeView/"+sessionValue,
                     contentType: "application/json",
                     crossDomain: true,
                     dataType: "json",

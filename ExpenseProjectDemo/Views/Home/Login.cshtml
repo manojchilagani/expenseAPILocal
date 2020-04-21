@@ -21,7 +21,7 @@
                 //debugger;
                     $.ajax({
                         type: "POST",
-                        url: "http://10.145.8.188/ExpenseManagementAPI1/api/login",
+                        url: "http://10.168.240.144:88/api/login",
                         data: JSON.stringify(s),
                         dataType:"json",
                         //contentType:"application/json",
@@ -60,7 +60,7 @@
                 
                     $.ajax({
                         type: 'POST',
-                        url: 'http://10.145.8.188/ExpenseManagementAPI1/api/user',
+                        url: 'http://10.168.240.144:88/api/user',
                         data: JSON.stringify(usr),
                         headers: {
                             'Accept': 'application/json',

@@ -34,7 +34,7 @@
             var sessionValue = $("#hdnSession").data('value');
             $.ajax({
                 type: "Get",
-                url: "http://10.145.8.188/ExpenseManagementAPI1/api/User/" + sessionValue,
+                url: "http://10.168.240.144:88/api/User/" + sessionValue,
                 contentType: "application/json",
                 crossDomain: true,
                 dataType: "json",
@@ -66,7 +66,7 @@
                 //C1.Paswword = "123#";
                 $.ajax({
                     type: "Put",
-                    url: "http://10.145.8.188/ExpenseManagementAPI1/api/user/" + sessionValue,
+                    url: "http://10.168.240.144:88/api/User/" + sessionValue,
                     contentType: "application/json",
                     crossDomain: true,
                     dataType: "json",
@@ -112,7 +112,7 @@
                 </div>
 
                 <div style="margin-left:50px;margin-right:50px;font-size:15px;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif" class="input-group">
-                    Phone No:
+                    Phone No':
                 </div>
                 <div style="margin-bottom: 25px;margin-left:50px;margin-right:50px" class="input-group">
                     <label id="UserName" type="text" class="form-control col-md-9" style="font-size:15px" />
